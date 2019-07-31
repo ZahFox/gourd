@@ -18,10 +18,10 @@ func main() {
 	app.Action = func(c *cli.Context) error {
 		osInfo, err := utils.Os()
 		checkerr(err)
-		writeErr := utils.Write("test.txt", &osInfo)
+		writeErr := utils.WriteJSON("test.txt", &osInfo)
 		checkerr(writeErr)
 
-		readErr := utils.Read("test.txt", &osInfo)
+		readErr := utils.ReadJSON("test.txt", &osInfo)
 		checkerr(readErr)
 		fmt.Printf("%+v\n", osInfo)
 		return nil

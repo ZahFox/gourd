@@ -8,8 +8,8 @@ import (
 	"io/ioutil"
 )
 
-// Write a data structure to a path as JSON
-func Write(path string, data interface{}) error {
+// WriteJSON saves a data structure to a path in JSON format
+func WriteJSON(path string, data interface{}) error {
 	var buffer bytes.Buffer
 	bytes, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
@@ -27,8 +27,8 @@ func Write(path string, data interface{}) error {
 	return nil
 }
 
-// Read JSON from a path into a data structure
-func Read(path string, data interface{}) error {
+// ReadJSON decodes JSON formatted data from a path into a data structure
+func ReadJSON(path string, data interface{}) error {
 	bytes, readErr := ioutil.ReadFile(path)
 	if readErr != nil {
 		return readErr
