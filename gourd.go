@@ -24,6 +24,9 @@ func main() {
 		readErr := utils.ReadJSON("test.txt", &osInfo)
 		checkerr(readErr)
 		fmt.Printf("%+v\n", osInfo)
+		path, err := utils.ProgramExists("exx")
+		checkerr(err)
+		log.Println(path)
 		return nil
 	}
 
