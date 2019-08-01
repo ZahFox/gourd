@@ -2,7 +2,6 @@ package utils
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -10,6 +9,8 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
+
+	"github.com/pkg/errors"
 )
 
 // OsInfo represents data about the host machine's operating system
@@ -21,7 +22,7 @@ type OsInfo struct {
 	OperatingSystem string `json:"operating_system"`
 }
 
-// Os returns HostInfo about the host machine.
+// Os returns OsInfo about the host machine.
 func Os() (OsInfo, error) {
 	var host OsInfo
 	var out bytes.Buffer
@@ -46,24 +47,16 @@ func Os() (OsInfo, error) {
 	return host, err
 }
 
-// ProgramExists checks to see if a program is in the current $PATH and is executable
-func ProgramExists(name string) (string, error) {
-	path, err := exec.LookPath(name)
-	if err != nil {
-		errMsg := fmt.Sprintf("Could not find the executable: %s. Please check your $PATH.", name)
-		return "", errors.New(errMsg)
-	}
-
+// UserCanExec checks to see if a file can be executed by the current $USER
+func UserCanExec(path string) (bool, error) {
 	info, err := os.Stat(path)
 	if err != nil {
-		errMsg := fmt.Sprintf("Failed to stat the following file: %s.", path)
-		return "", errors.New(errMsg)
+		return false, errors.Wrapf(err, "Failed to stat the following file: %s", path)
 	}
 
 	userInfo, err := user.Current()
 	if err != nil {
-		errMsg := fmt.Sprintf("Failed to find information about the current user.")
-		return "", errors.New(errMsg)
+		return false, errors.Wrapf(err, "Failed to find information about the current user")
 	}
 
 	mode := info.Mode()
@@ -71,7 +64,7 @@ func ProgramExists(name string) (string, error) {
 	or := mode & 4
 
 	if ox == 1 && or == 4 {
-		return path, nil
+		return true, nil
 	}
 
 	ux := mode & 64
@@ -84,11 +77,10 @@ func ProgramExists(name string) (string, error) {
 	userGID, _ := strconv.ParseUint(userInfo.Gid, 10, 32)
 
 	if uint32(userUID) == fileUID && ux == 64 && ur == 256 {
-		return path, nil
+		return true, nil
 	} else if uint32(userGID) == fileGID && gx == 8 && gr == 32 {
-		return path, nil
+		return true, nil
 	}
 
-	errMsg := fmt.Sprintf("The current user does not have permission to execute: %s.", path)
-	return "", errors.New(errMsg)
+	return false, fmt.Errorf("The current user does not have permission to execute: %s.", path)
 }

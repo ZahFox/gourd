@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 
 	"github.com/urfave/cli"
 	"github.com/zahfox/gourd/utils"
@@ -24,9 +25,17 @@ func main() {
 		readErr := utils.ReadJSON("test.txt", &osInfo)
 		checkerr(readErr)
 		fmt.Printf("%+v\n", osInfo)
-		path, err := utils.ProgramExists("exx")
+
+		path, err := exec.LookPath("ls")
 		checkerr(err)
-		log.Println(path)
+
+		success, err := utils.UserCanExec(path)
+		checkerr(err)
+
+		if success {
+			log.Printf("$USER can exec %s", path)
+		}
+
 		return nil
 	}
 

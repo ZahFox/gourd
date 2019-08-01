@@ -4,3 +4,4 @@ gourd
 /bin/
 /build/
 *.txt
+*.code-workspace
