@@ -1,0 +1,99 @@
+// Gourd is my personal linux configuration tool.
+package main
+
+import (
+	"fmt"
+	"log"
+	"net"
+	"os"
+	"os/exec"
+
+	"github.com/pkg/errors"
+	"github.com/urfave/cli"
+	"github.com/zahfox/gourd/pkg/utils"
+)
+
+func main() {
+	app := cli.NewApp()
+	configureAppInfo(app)
+	configureAppCommands(app)
+	configureAppAction(app)
+	err := app.Run(os.Args)
+	checkerr(err)
+}
+
+func configureAppInfo(app *cli.App) {
+	app.Name = "gourd"
+	app.Usage = "linux configuration tool"
+}
+
+func configureAppCommands(app *cli.App) {
+	ipFlags := []cli.Flag{
+		cli.StringFlag{
+			Name: "host",
+		},
+	}
+
+	app.Commands = []cli.Command{
+		{
+			Name:  "ip",
+			Usage: "Looks up the IP address for a particular host",
+			Flags: ipFlags,
+			Action: func(c *cli.Context) error {
+				var host string
+				arg := c.Args().First()
+				if len(arg) > 0 {
+					host = arg
+				} else {
+					host = c.String("host")
+				}
+
+				if len(host) < 1 {
+					host = "localhost"
+				}
+
+				ip, err := net.LookupIP(host)
+				if err != nil {
+					return errors.Wrap(err, "Hostname error")
+				}
+
+				for i := 0; i < len(ip); i++ {
+					fmt.Println(ip[i])
+				}
+
+				return nil
+			},
+		},
+	}
+}
+
+func configureAppAction(app *cli.App) {
+	app.Action = func(c *cli.Context) error {
+		osInfo, err := utils.Os()
+		checkerr(err)
+		writeErr := utils.WriteJSON("test.txt", &osInfo)
+		checkerr(writeErr)
+
+		readErr := utils.ReadJSON("test.txt", &osInfo)
+		checkerr(readErr)
+		fmt.Printf("%+v\n", osInfo)
+
+		path, err := exec.LookPath("ls")
+		checkerr(err)
+
+		success, err := utils.UserCanExec(path)
+		checkerr(err)
+
+		if success {
+			log.Printf("$USER can exec %s", path)
+		}
+
+		return nil
+	}
+}
+
+func checkerr(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
+}
