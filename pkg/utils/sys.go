@@ -22,8 +22,14 @@ type OsInfo struct {
 	OperatingSystem string `json:"operating_system"`
 }
 
+var osInfo OsInfo
+
 // Os returns OsInfo about the host machine.
 func Os() (OsInfo, error) {
+	if osInfo.KernelName != "" {
+		return osInfo, nil
+	}
+
 	var host OsInfo
 	var out bytes.Buffer
 
@@ -36,7 +42,7 @@ func Os() (OsInfo, error) {
 	}
 
 	sysinfo := strings.Split(out.String(), " ")
-	host = OsInfo{
+	osInfo = OsInfo{
 		KernelName:      sysinfo[0],
 		NodeName:        sysinfo[1],
 		KernelRelease:   sysinfo[2],
@@ -44,7 +50,21 @@ func Os() (OsInfo, error) {
 		OperatingSystem: sysinfo[4],
 	}
 
-	return host, err
+	return osInfo, err
+}
+
+// Exec provides a thin wrapper over exec.Command
+func Exec(name string, arg ...string) bool {
+	cmd := exec.Command(name, arg...)
+	cmd.Stderr = os.Stdout
+	cmd.Stdout = os.Stderr
+	err := cmd.Run()
+
+	if err != nil {
+		return false
+	}
+
+	return true
 }
 
 // UserCanExec checks to see if a file can be executed by the current $USER

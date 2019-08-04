@@ -10,6 +10,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
+	"github.com/zahfox/gourd/pkg/distro"
 	"github.com/zahfox/gourd/pkg/utils"
 )
 
@@ -61,6 +62,22 @@ func configureAppCommands(app *cli.App) {
 					fmt.Println(ip[i])
 				}
 
+				return nil
+			},
+		},
+		{
+			Name:  "install",
+			Usage: "Installs a package using the distribution package manager",
+			Action: func(c *cli.Context) error {
+				distro.GetDistro().Install(c.Args()...)
+				return nil
+			},
+		},
+		{
+			Name:  "uninstall",
+			Usage: "Uninstalls a package using the distribution package manager",
+			Action: func(c *cli.Context) error {
+				distro.GetDistro().Uninstall(c.Args()...)
 				return nil
 			},
 		},
