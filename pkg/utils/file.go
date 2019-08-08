@@ -3,9 +3,11 @@
 package utils
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
+	"os"
 )
 
 // WriteJSON saves a data structure to a path in JSON format
@@ -19,22 +21,31 @@ func WriteJSON(path string, data interface{}) error {
 	buffer.Write(bytes)
 	buffer.WriteString("\n")
 
-	writeErr := ioutil.WriteFile(path, buffer.Bytes(), 0600)
-	if writeErr != nil {
-		return writeErr
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, 0660)
+	if err != nil {
+		return err
 	}
 
-	return nil
+	writer := bufio.NewWriter(file)
+	_, err = writer.Write(buffer.Bytes())
+
+	if err != nil {
+		writer.Reset(writer)
+		return err
+	}
+
+	err = writer.Flush()
+	return err
 }
 
 // ReadJSON decodes JSON formatted data from a path into a data structure
 func ReadJSON(path string, data interface{}) error {
-	bytes, readErr := ioutil.ReadFile(path)
-	if readErr != nil {
-		return readErr
+	bytes, err := ioutil.ReadFile(path)
+	if err != nil {
+		return err
 	}
 
-	err := json.Unmarshal(bytes, &data)
+	err = json.Unmarshal(bytes, data)
 	if err != nil {
 		return err
 	}

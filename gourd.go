@@ -10,11 +10,13 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
+	"github.com/zahfox/gourd/pkg/config"
 	"github.com/zahfox/gourd/pkg/distro"
 	"github.com/zahfox/gourd/pkg/utils"
 )
 
 func main() {
+	config.Load()
 	app := cli.NewApp()
 	configureAppInfo(app)
 	configureAppCommands(app)
@@ -86,15 +88,6 @@ func configureAppCommands(app *cli.App) {
 
 func configureAppAction(app *cli.App) {
 	app.Action = func(c *cli.Context) error {
-		osInfo, err := utils.Os()
-		checkerr(err)
-		writeErr := utils.WriteJSON("test.txt", &osInfo)
-		checkerr(writeErr)
-
-		readErr := utils.ReadJSON("test.txt", &osInfo)
-		checkerr(readErr)
-		fmt.Printf("%+v\n", osInfo)
-
 		path, err := exec.LookPath("ls")
 		checkerr(err)
 
