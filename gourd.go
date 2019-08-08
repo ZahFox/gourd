@@ -12,6 +12,7 @@ import (
 	"github.com/urfave/cli"
 	"github.com/zahfox/gourd/pkg/config"
 	"github.com/zahfox/gourd/pkg/distro"
+	"github.com/zahfox/gourd/pkg/misc"
 	"github.com/zahfox/gourd/pkg/utils"
 )
 
@@ -80,6 +81,14 @@ func configureAppCommands(app *cli.App) {
 			Usage: "Uninstalls a package using the distribution package manager",
 			Action: func(c *cli.Context) error {
 				distro.GetDistro().Uninstall(c.Args()...)
+				return nil
+			},
+		},
+		{
+			Name:  "misc",
+			Usage: "Used to test miscellaneous experiments",
+			Action: func(c *cli.Context) error {
+				misc.Run()
 				return nil
 			},
 		},
