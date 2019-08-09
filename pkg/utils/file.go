@@ -4,7 +4,6 @@ package utils
 
 import (
 	"bufio"
-	"bytes"
 	"encoding/json"
 	"io/ioutil"
 	"os"
@@ -12,22 +11,20 @@ import (
 
 // WriteJSON saves a data structure to a path in JSON format
 func WriteJSON(path string, data interface{}) error {
-	var buffer bytes.Buffer
 	bytes, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
 		return err
 	}
 
-	buffer.Write(bytes)
-	buffer.WriteString("\n")
-
-	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, 0660)
+	bytes = append(bytes, byte('\n'))
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, 0640)
 	if err != nil {
 		return err
 	}
+	defer file.Close()
 
 	writer := bufio.NewWriter(file)
-	_, err = writer.Write(buffer.Bytes())
+	_, err = writer.Write(bytes)
 
 	if err != nil {
 		writer.Reset(writer)
@@ -35,6 +32,11 @@ func WriteJSON(path string, data interface{}) error {
 	}
 
 	err = writer.Flush()
+	if err != nil {
+		return err
+	}
+
+	err = file.Sync()
 	return err
 }
 
