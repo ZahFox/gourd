@@ -21,6 +21,10 @@ type Config struct {
 var initialized = false
 
 // Load takes care of all the config package's initialization
+//
+// This is used instead of an init function because some interactions with gourd do not
+// require access to the gourd config. It is the responsibility of any sigificant system
+// to manually invoke Load.
 func Load() {
 	if initialized {
 		return
@@ -40,13 +44,16 @@ func checkConfigDir() {
 func loadConfig() *Config {
 	path := getConfigPath()
 	var data *Config
-	err := utils.ReadJSON(path, &data)
+	err := utils.ReadJSON(path, data)
 
 	if err != nil {
 		data = getDefaultConfig()
 		utils.WriteJSON(path, data)
 	}
 
+	// TODO:
+	// 1. Validate the config file
+	// 2. Add logic for configs with outdated or invalid versions
 	return data
 }
 
