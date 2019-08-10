@@ -5,7 +5,13 @@ import (
 	"math/rand"
 	"sync"
 	"time"
+
+	"github.com/zahfox/gourd/pkg/utils"
 )
+
+var programs = [...]string{"ls", "whoami", "pwd"}
+
+type funcGenerator func() (uint32, func())
 
 // ProcessSwarm creates a worker pool
 func ProcessSwarm() {
@@ -25,26 +31,26 @@ func ProcessSwarm() {
 }
 
 func buildCommands(count int) *[]string {
+	programCount := len(programs)
 	commands := make([]string, count)
 	for i := 0; i < count; i++ {
-		commands[i] = fmt.Sprintf("COMMAND: %d", i)
+		commands[i] = programs[i%programCount]
 	}
 	return &commands
 }
 
-func taskGenerator(commands *[]string, count int) func() (uint32, func()) {
+func taskGenerator(commands *[]string, count int) funcGenerator {
 	return func() (uint32, func()) {
 		command := (*commands)[randRange(0, count-1)]
-		task := func() {
-			fmt.Println(command)
+		return rand.Uint32(), func() {
+			utils.Exec(command)
 			time.Sleep(time.Duration(randRange(1, 5)) * time.Second)
 		}
-		return rand.Uint32(), task
 	}
 
 }
 
-func worker(wg *sync.WaitGroup, getTask func() (uint32, func())) {
+func worker(wg *sync.WaitGroup, getTask funcGenerator) {
 	tag := randRange(1, 512*2*2*2*2*2*2)
 	generator := genRange(1, 10)
 	exitCode := generator()
