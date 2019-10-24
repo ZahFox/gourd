@@ -54,17 +54,11 @@ func Os() (OsInfo, error) {
 }
 
 // Exec provides a thin wrapper over exec.Command
-func Exec(name string, arg ...string) bool {
+func Exec(name string, arg ...string) error {
 	cmd := exec.Command(name, arg...)
 	cmd.Stderr = os.Stdout
 	cmd.Stdout = os.Stderr
-	err := cmd.Run()
-
-	if err != nil {
-		return false
-	}
-
-	return true
+	return cmd.Run()
 }
 
 // UserCanExec checks to see if a file can be executed by the current $USER

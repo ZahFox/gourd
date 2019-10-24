@@ -26,8 +26,8 @@ const (
 // PackageManager is used to interact with any distribution's package manager
 // from a common interface
 type PackageManager interface {
-	Install(packages ...string) bool
-	Uninstall(packages ...string) bool
+	Install(packages ...string) error
+	Uninstall(packages ...string) error
 }
 
 // Distro is used to interact with any Linux distribution from a common interface
