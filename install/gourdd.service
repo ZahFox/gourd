@@ -1,0 +1,10 @@
+[Unit]
+Description=gourdd service
+Requires=gourdd.socket
+
+[Service]
+ExecStart=/usr/local/bin/gourdd
+NonBlocking=true
+
+[Install]
+WantedBy=multi-user.target

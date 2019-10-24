@@ -1,0 +1,9 @@
+[Unit]
+Description=gourdd socket
+
+[Socket]
+ListenStream=/run/gourd/gourdd.sock
+NoDelay=true
+
+[Install]
+WantedBy=sockets.target
