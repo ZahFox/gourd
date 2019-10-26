@@ -3,36 +3,18 @@
 package daemon
 
 import (
-	"io"
-	"log"
+	"errors"
 	"net"
-	"net/http"
 	"os"
 	"strconv"
 )
 
-func handleRequest(w http.ResponseWriter, req *http.Request) {
-	io.WriteString(w, "gourdd: Hello, Client!\n")
-}
-
-func pong(w http.ResponseWriter, req *http.Request) {
-	io.WriteString(w, "PONG\n")
-}
-
-// MakeSocket creates the Unix domain socket used for sending commands to gourdd
-func MakeSocket() {
+// CreateListener creates a network listener to be used by gourdd
+func CreateListener() (net.Listener, error) {
 	if os.Getenv("LISTEN_PID") == strconv.Itoa(os.Getpid()) {
 		f := os.NewFile(3, "socket")
-		l, err := net.FileListener(f)
-
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		http.HandleFunc("/", handleRequest)
-		http.HandleFunc("/ping", pong)
-		http.Serve(l, nil)
-	} else {
-		log.Panicf("gourdd: could not find any sockets supplied by systemd")
+		return net.FileListener(f)
 	}
+
+	return nil, errors.New("could not find any sockets supplied by systemd")
 }

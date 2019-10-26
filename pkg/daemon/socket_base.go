@@ -3,11 +3,17 @@
 package daemon
 
 import (
-	"fmt"
+	"log"
+	"net"
+	"os"
 )
 
-// MakeSocket creates the Unix domain socket used for sending commands to gourdd
-func MakeSocket() interface{} {
-	fmt.Println("NO SYSTEMD!!!")
-	return nil
+// CreateListener creates a network listener to be used by gourdd
+func CreateListener() (net.Listener, error) {
+	socketPath := GetSocketPath()
+	if err := os.RemoveAll(socketPath); err != nil {
+		log.Fatal(err)
+	}
+
+	return net.Listen("unix", socketPath)
 }

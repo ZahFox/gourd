@@ -8,4 +8,5 @@ import (
 
 func main() {
 	log.Printf("gourdd: listening for commands at: %s", daemon.GetSocketPath())
+	daemon.GetDaemon().Listen()
 }
