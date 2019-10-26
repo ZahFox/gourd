@@ -7,4 +7,5 @@ ExecStart=/usr/local/bin/gourdd
 NonBlocking=true
 
 [Install]
+Alias=gourd.service
 WantedBy=multi-user.target
