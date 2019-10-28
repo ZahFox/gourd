@@ -4,6 +4,10 @@ import (
 	"io"
 	"log"
 	"net"
+	"net/http"
+	"net/rpc"
+
+	cmd "github.com/zahfox/gourd/pkg/daemon/rpc"
 )
 
 // Daemon is used to group together data related to gourdd
@@ -15,23 +19,19 @@ type Daemon struct {
 // Listen will accept socket connections and respond to their commands
 func (d *Daemon) Listen() {
 	defer d.Socket.Close()
-
-	for {
-		conn, err := d.Socket.Accept()
-		if err != nil {
-			log.Fatal("accept error:", err)
-		}
-
-		go echoServer(conn)
-	}
+	http.Serve(d.Socket, nil)
 }
 
 var daemon Daemon
 
 func init() {
 	daemon.ID = "1"
-	socket, err := CreateListener()
 
+	commandHandler := new(cmd.CommandHandler)
+	rpc.Register(commandHandler)
+	rpc.HandleHTTP()
+
+	socket, err := CreateListener()
 	if err != nil {
 		log.Fatalf("failed to listen to socket at %s. %s", GetSocketPath(), err)
 	}
