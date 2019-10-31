@@ -6,7 +6,9 @@ import (
 	"net"
 	"net/http"
 	"net/rpc"
+	"os"
 
+	"github.com/zahfox/gourd/pkg/config"
 	cmd "github.com/zahfox/gourd/pkg/daemon/rpc"
 )
 
@@ -23,6 +25,7 @@ func (d *Daemon) Listen() {
 }
 
 var daemon *Daemon
+var socketPath = ""
 
 // GetDaemon will return the primary instance of gourdd
 func GetDaemon() *Daemon {
@@ -46,7 +49,25 @@ func GetDaemon() *Daemon {
 
 // GetSocketPath returns the filesystem path to the command socket
 func GetSocketPath() string {
-	return "/run/gourd/gourdd.sock"
+	if socketPath != "" {
+		return socketPath
+	}
+
+	path := os.Getenv("GOURD_GOURDD_SOCKET")
+	if path != "" {
+		socketPath = path
+		return socketPath
+	}
+
+	env := config.GetEnv()
+	if env == config.Debug {
+		os.MkdirAll("/tmp/.gourd", 0700)
+		socketPath = "/tmp/.gourd/gourdd-debug.sock"
+	} else {
+		socketPath = "/run/gourd/gourdd.sock"
+	}
+
+	return socketPath
 }
 
 func echoServer(c net.Conn) {

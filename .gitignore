@@ -4,4 +4,7 @@
 /vendor/
 /build/
 *.txt
+
+# Editor Files
 *.code-workspace
+.vscode
