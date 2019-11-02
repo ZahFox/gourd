@@ -11,7 +11,7 @@ var registered = false
 
 var handler *codec.CborHandle
 
-// HandleConnection creates a new gourdd rpc codec
+// HandleConnection creates a new gourdd rpc server codec
 func HandleConnection(conn io.ReadWriteCloser) {
 	rpc.ServeCodec(codec.GoRpc.ServerCodec(conn, handler))
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
 
+	"github.com/zahfox/gourd/pkg/client"
 	"github.com/zahfox/gourd/pkg/config"
 	"github.com/zahfox/gourd/pkg/distro"
 	"github.com/zahfox/gourd/pkg/misc"
@@ -66,6 +67,29 @@ func configureAppCommands(app *cli.App) {
 					fmt.Println(ip[i])
 				}
 
+				return nil
+			},
+		},
+		{
+			Name:  "client",
+			Usage: "Starts a new gourd client",
+			Action: func(c *cli.Context) error {
+				client := client.NewClient()
+				client.Run()
+
+				go func() {
+					for i := 10; i > 0; i-- {
+						client.Ping()
+						client.Ping()
+						client.Ping()
+						client.Echo("ECHO")
+					}
+					client.Stop()
+				}()
+
+				log.Println("Waiting for gourd client to exit")
+				client.Wait()
+				client.Exit()
 				return nil
 			},
 		},

@@ -9,6 +9,6 @@ import (
 
 func main() {
 	config.Load()
-	log.Printf("Listening for commands at %s", daemon.GetSocketPath())
+	log.Printf("Listening for commands at %s", config.GetSocketPath())
 	daemon.GetDaemon().Listen()
 }

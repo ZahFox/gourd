@@ -32,8 +32,8 @@ const (
 
 // Request is what a clients use to issue new commands
 type Request struct {
-	Seq    uint64      `json:"seq"`
-	Method string      `json:"method"`
+	Action Action      `json:"action"`
+	Target Target      `json:"target"`
 	Params interface{} `json:"body"`
 }
 
@@ -52,18 +52,18 @@ type Command struct {
 }
 
 // NewRequest creates a new command request
-func NewRequest(seq uint64, action Action, target Target, params interface{}) Request {
+func NewRequest(action Action, target Target, params interface{}) Request {
 	return Request{
-		Seq:    seq,
-		Method: GenServiceMethod(action, target),
+		Action: action,
+		Target: target,
 		Params: params,
 	}
 }
 
 // Clear sets all of the request fields to empty values
 func (r *Request) Clear() {
-	r.Seq = 0
-	r.Method = ""
+	r.Action = NOACTION
+	r.Target = NOTARGET
 	r.Params = nil
 }
 
@@ -101,9 +101,8 @@ func (c *Command) Set(action Action, target Target, body interface{}) {
 func (c *Command) SetFromRequest(r *Request) {
 	c.ID = uuid.New().String()
 	c.Timestamp = time.Now().UTC().UnixNano()
-	action, target := ParseServiceMethod(r.Method)
-	c.Action = action
-	c.Target = target
+	c.Action = r.Action
+	c.Target = r.Target
 	c.Body = r.Params
 }
 
@@ -122,8 +121,8 @@ func NewHostPing() Command {
 }
 
 // NewHostEcho creates a new echo command for the local gourdd
-func NewHostEcho() Command {
-	return NewCommand(ECHO, HOST, nil)
+func NewHostEcho(msg string) Command {
+	return NewCommand(ECHO, HOST, msg)
 }
 
 // ActionCode converts an action string into its code representation
@@ -181,8 +180,6 @@ func ParseServiceMethod(sm string) (Action, Target) {
 
 // GenServiceMethod converts a pair of target and action codes into a "Target.Action" string
 func GenServiceMethod(action Action, target Target) string {
-	return strings.Join([]string{
-		strings.ToTitle(TargetString(target)),
-		strings.ToTitle(ActionString(action)),
-	}, ".")
+	return strings.Join([]string{strings.Title(strings.ToLower(TargetString(target))),
+		strings.Title(strings.ToLower(ActionString(action)))}, ".")
 }

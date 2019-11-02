@@ -3,7 +3,6 @@ package daemon
 import (
 	"log"
 	"net"
-	"os"
 
 	"github.com/zahfox/gourd/pkg/config"
 	"github.com/zahfox/gourd/pkg/daemon/rpc"
@@ -26,13 +25,12 @@ func (d *Daemon) Listen() {
 			log.Fatalf("Socket connection error: %+v\n", err)
 		}
 
-		log.Printf("New socket connection from %s\n", conn.RemoteAddr())
+		log.Printf("New socket connection from %s\n", conn.RemoteAddr().String())
 		rpc.HandleConnection(conn)
 	}
 }
 
 var daemon *Daemon
-var socketPath = ""
 
 // GetDaemon will return the primary instance of gourdd
 func GetDaemon() *Daemon {
@@ -42,33 +40,10 @@ func GetDaemon() *Daemon {
 
 		socket, err := CreateListener()
 		if err != nil {
-			log.Fatalf("Failed to listen to socket at %s. %s", GetSocketPath(), err)
+			log.Fatalf("Failed to listen to socket at %s. %s", config.GetSocketPath(), err)
 		}
 
 		daemon.Socket = socket
 	}
 	return daemon
-}
-
-// GetSocketPath returns the filesystem path to the command socket
-func GetSocketPath() string {
-	if socketPath != "" {
-		return socketPath
-	}
-
-	path := os.Getenv("GOURD_GOURDD_SOCKET")
-	if path != "" {
-		socketPath = path
-		return socketPath
-	}
-
-	env := config.GetEnv()
-	if env == config.Debug {
-		os.MkdirAll("/tmp/.gourd", 0700)
-		socketPath = "/tmp/.gourd/gourdd-debug.sock"
-	} else {
-		socketPath = "/run/gourd/gourdd.sock"
-	}
-
-	return socketPath
 }

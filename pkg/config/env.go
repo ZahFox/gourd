@@ -23,6 +23,7 @@ const (
 )
 
 var env Env = Unknown
+var socketPath = ""
 
 // Determine the type of runtime environment that is currently active
 func GetEnv() Env {
@@ -31,6 +32,29 @@ func GetEnv() Env {
 		log.Printf("Running in a %s environment", envToString())
 	}
 	return env
+}
+
+// GetSocketPath returns the filesystem path to the command socket
+func GetSocketPath() string {
+	if socketPath != "" {
+		return socketPath
+	}
+
+	path := os.Getenv("GOURD_GOURDD_SOCKET")
+	if path != "" {
+		socketPath = path
+		return socketPath
+	}
+
+	env := GetEnv()
+	if env == Debug {
+		os.MkdirAll("/tmp/.gourd", 0700)
+		socketPath = "/tmp/.gourd/gourdd-debug.sock"
+	} else {
+		socketPath = "/run/gourd/gourdd.sock"
+	}
+
+	return socketPath
 }
 
 func processEnv() Env {
