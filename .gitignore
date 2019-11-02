@@ -11,3 +11,5 @@ gourd
 # Editor Files
 *.code-workspace
 .vscode
+
+!cmd/gourd
