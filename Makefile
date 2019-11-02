@@ -22,7 +22,7 @@ info:
 
 build: clean-build
 			for target in $(WHAT); do \
-						$(BUILD_ENV_FLAGS) go build $(BUILD_TAGS) $(V) -o bin/$$target -ldflags "-X $(REPOPATH).Version=$(VERSION)" ./cmd/$$target/$$target.go; \
+						$(BUILD_ENV_FLAGS) go build $(BUILD_TAGS) $(V) -o bin/$$target -ldflags "-X $(REPOPATH).Version=$(VERSION)" ./cmd/$$target; \
 			done
 
 install: clean-install build 

@@ -5,6 +5,9 @@
 /build/
 *.txt
 
+gourd.go
+gourd
+
 # Editor Files
 *.code-workspace
 .vscode

@@ -1,27 +1,34 @@
 package daemon
 
 import (
-	"io"
 	"log"
 	"net"
-	"net/http"
-	"net/rpc"
 	"os"
 
 	"github.com/zahfox/gourd/pkg/config"
-	cmd "github.com/zahfox/gourd/pkg/daemon/rpc"
+	"github.com/zahfox/gourd/pkg/daemon/rpc"
 )
 
 // Daemon is used to group together data related to gourdd
 type Daemon struct {
-	ID     string
+	ID     uint8
 	Socket net.Listener
 }
 
-// Listen will accept socket connections and respond to their commands
+// Listen will accept socket connections and forward them to the rpc command handler
 func (d *Daemon) Listen() {
 	defer d.Socket.Close()
-	http.Serve(d.Socket, nil)
+	rpc.RegisterHandler()
+
+	for {
+		conn, err := d.Socket.Accept()
+		if err != nil {
+			log.Fatalf("Socket connection error: %+v\n", err)
+		}
+
+		log.Printf("New socket connection from %s\n", conn.RemoteAddr())
+		rpc.HandleConnection(conn)
+	}
 }
 
 var daemon *Daemon
@@ -31,15 +38,11 @@ var socketPath = ""
 func GetDaemon() *Daemon {
 	if daemon == nil {
 		daemon = new(Daemon)
-		daemon.ID = "1"
-
-		commandHandler := new(cmd.CommandHandler)
-		rpc.Register(commandHandler)
-		rpc.HandleHTTP()
+		daemon.ID = 0
 
 		socket, err := CreateListener()
 		if err != nil {
-			log.Fatalf("failed to listen to socket at %s. %s", GetSocketPath(), err)
+			log.Fatalf("Failed to listen to socket at %s. %s", GetSocketPath(), err)
 		}
 
 		daemon.Socket = socket
@@ -68,10 +71,4 @@ func GetSocketPath() string {
 	}
 
 	return socketPath
-}
-
-func echoServer(c net.Conn) {
-	log.Printf("Client connected [%s]", c.RemoteAddr().Network())
-	io.Copy(c, c)
-	c.Close()
 }
