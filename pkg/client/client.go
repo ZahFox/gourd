@@ -3,11 +3,14 @@ package client
 import (
 	"log"
 	"net/rpc"
+	"os"
 
 	"github.com/zahfox/gourd/pkg/command"
 )
 
 type Client struct {
+	sl      *log.Logger
+	el      *log.Logger
 	c       *rpc.Client
 	cmdc    chan *command.Request
 	sigc    chan int
@@ -15,7 +18,12 @@ type Client struct {
 }
 
 func NewClient() Client {
-	return Client{getConn(), make(chan *command.Request), make(chan int), false}
+	return Client{
+		log.New(os.Stdout, "", 0),
+		log.New(os.Stderr, "", 0),
+		getConn(),
+		make(chan *command.Request),
+		make(chan int), false}
 }
 
 func (c *Client) Echo(msg string) {
@@ -65,7 +73,7 @@ func (c *Client) run() {
 			c.handleCommand(cmd)
 		case sig := <-c.sigc:
 			if sig > 0 {
-				log.Println("Client stopped")
+				c.sl.Println("Client stopped")
 				return
 			}
 		}
@@ -73,27 +81,28 @@ func (c *Client) run() {
 }
 
 func (c *Client) handleCommand(cmd *command.Request) {
-	if cmd.Target != command.HOST {
+	action, target := (*cmd).GetAction(), (*cmd).GetTarget()
+	if target != command.HOST {
 		return
 	}
 
 	var err error
 	var res string
-	method := command.GenServiceMethod(cmd.Action, cmd.Target)
+	method := command.GenServiceMethod(action, target)
 
-	switch cmd.Action {
+	switch action {
 	case command.PING:
-		err = c.c.Call(method, &cmd.Params, &res)
+		err = c.c.Call(method, (*cmd).GetParams(), &res)
 		break
 	case command.ECHO:
-		err = c.c.Call(method, &cmd.Params, &res)
+		err = c.c.Call(method, (*cmd).GetParams(), &res)
 		break
 	}
 
 	if err != nil {
-		log.Println("Error from command", err)
+		c.el.Println("Error from command", err)
 		return
 	} else {
-		log.Println(res)
+		c.sl.Println(res)
 	}
 }

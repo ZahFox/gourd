@@ -8,35 +8,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// Action is what the gourd client is requesting to be done
-type Action int
-
-const (
-	// NOACTION is a request with no action
-	NOACTION Action = iota
-	// PING is a request to recieve a PONG response
-	PING
-	// ECHO is a request to have text echoed back
-	ECHO
-)
-
-// Target is what should be affected the action of a command
-type Target int
-
-const (
-	// NOTARGET means no target
-	NOTARGET Target = iota
-	// HOST is a target that represents the local gourdd
-	HOST
-)
-
-// Request is what a clients use to issue new commands
-type Request struct {
-	Action Action      `json:"action"`
-	Target Target      `json:"target"`
-	Params interface{} `json:"body"`
-}
-
 // Header contains all of the metadata for a command
 type Header struct {
 	ID        string `json:"id"`
@@ -49,22 +20,6 @@ type Header struct {
 type Command struct {
 	Header
 	Body interface{} `json:"body"`
-}
-
-// NewRequest creates a new command request
-func NewRequest(action Action, target Target, params interface{}) Request {
-	return Request{
-		Action: action,
-		Target: target,
-		Params: params,
-	}
-}
-
-// Clear sets all of the request fields to empty values
-func (r *Request) Clear() {
-	r.Action = NOACTION
-	r.Target = NOTARGET
-	r.Params = nil
 }
 
 // NewCommand creates a new command
@@ -98,12 +53,12 @@ func (c *Command) Set(action Action, target Target, body interface{}) {
 }
 
 // SetFromRequest updates the command data using a request
-func (c *Command) SetFromRequest(r *Request) {
+func (c *Command) SetFromRequest(r Request) {
 	c.ID = uuid.New().String()
 	c.Timestamp = time.Now().UTC().UnixNano()
-	c.Action = r.Action
-	c.Target = r.Target
-	c.Body = r.Params
+	c.Action = r.GetAction()
+	c.Target = r.GetTarget()
+	c.Body = r.GetParams()
 }
 
 func (c *Command) String() string {
