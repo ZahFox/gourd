@@ -87,15 +87,19 @@ func (c *Client) handleCommand(cmd *command.Request) {
 	}
 
 	var err error
-	var res string
+	var msg string
 	method := command.GenServiceMethod(action, target)
 
 	switch action {
 	case command.PING:
+		var res command.PingResponse
 		err = c.c.Call(method, (*cmd).GetParams(), &res)
+		msg = res.Message
 		break
 	case command.ECHO:
+		var res command.EchoResponse
 		err = c.c.Call(method, (*cmd).GetParams(), &res)
+		msg = res.Message
 		break
 	}
 
@@ -103,6 +107,6 @@ func (c *Client) handleCommand(cmd *command.Request) {
 		c.el.Println("Error from command", err)
 		return
 	} else {
-		c.sl.Println(res)
+		c.sl.Println(msg)
 	}
 }
