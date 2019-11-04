@@ -1,12 +1,12 @@
 package client
 
 import (
-	"log"
 	"net"
 	"net/rpc"
 
 	"github.com/ugorji/go/codec"
 	"github.com/zahfox/gourd/pkg/config"
+	"github.com/zahfox/gourd/pkg/utils"
 )
 
 var handle *codec.CborHandle
@@ -20,7 +20,7 @@ func init() {
 func getConn() *rpc.Client {
 	nc, err := net.Dial("unix", config.GetSocketPath())
 	if err != nil {
-		log.Fatal("Failed to connect to gourdd. ", err)
+		utils.LogFatal("Failed to connect to gourdd. ", err)
 	}
 
 	rpcCodec := codec.GoRpc.ClientCodec(nc, handle)

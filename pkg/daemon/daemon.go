@@ -1,11 +1,11 @@
 package daemon
 
 import (
-	"log"
 	"net"
 
 	"github.com/zahfox/gourd/pkg/config"
 	"github.com/zahfox/gourd/pkg/daemon/rpc"
+	"github.com/zahfox/gourd/pkg/utils"
 )
 
 // Daemon is used to group together data related to gourdd
@@ -22,10 +22,10 @@ func (d *Daemon) Listen() {
 	for {
 		conn, err := d.Socket.Accept()
 		if err != nil {
-			log.Fatalf("Socket connection error: %+v\n", err)
+			utils.LogFatalf("Socket connection error: %+v\n", err)
 		}
 
-		log.Printf("New socket connection from %s\n", conn.RemoteAddr().String())
+		utils.LogInfof("New socket connection from %s\n", conn.RemoteAddr().String())
 		go rpc.HandleConnection(conn)
 	}
 }
@@ -40,7 +40,7 @@ func GetDaemon() *Daemon {
 
 		socket, err := CreateListener()
 		if err != nil {
-			log.Fatalf("Failed to listen to socket at %s. %s", config.GetSocketPath(), err)
+			utils.LogFatalf("Failed to listen to socket at %s. %s", config.GetSocketPath(), err)
 		}
 
 		daemon.Socket = socket

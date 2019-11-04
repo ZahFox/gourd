@@ -1,14 +1,13 @@
 package main
 
 import (
-	"log"
-
 	"github.com/zahfox/gourd/pkg/config"
 	"github.com/zahfox/gourd/pkg/daemon"
+	"github.com/zahfox/gourd/pkg/utils"
 )
 
 func main() {
 	config.Load()
-	log.Printf("Listening for commands at %s", config.GetSocketPath())
+	utils.LogInfof("Listening for commands at %s", config.GetSocketPath())
 	daemon.GetDaemon().Listen()
 }

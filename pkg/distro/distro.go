@@ -1,7 +1,6 @@
 package distro
 
 import (
-	"log"
 	"strings"
 
 	"github.com/zahfox/gourd/pkg/utils"
@@ -50,7 +49,7 @@ func GetDistro() Distro {
 
 	osInfo, err := utils.Os()
 	if err != nil {
-		log.Fatal(err)
+		utils.LogFatal(err)
 	}
 
 	if strings.HasSuffix(osInfo.KernelRelease, "ARCH") {

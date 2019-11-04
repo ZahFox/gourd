@@ -3,7 +3,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net"
 	"os"
 	"os/exec"
@@ -87,7 +86,7 @@ func configureAppCommands(app *cli.App) {
 					client.Stop()
 				}()
 
-				log.Println("Waiting for gourd client to exit")
+				utils.LogInfo("Waiting for gourd client to exit")
 				client.Wait()
 				client.Exit()
 				return nil
@@ -129,7 +128,7 @@ func configureAppAction(app *cli.App) {
 		checkerr(err)
 
 		if success {
-			log.Printf("$USER can exec %s", path)
+			utils.LogInfof("$USER can exec %s", path)
 		}
 
 		return nil
@@ -138,6 +137,6 @@ func configureAppAction(app *cli.App) {
 
 func checkerr(err error) {
 	if err != nil {
-		log.Fatal(err)
+		utils.LogFatal(err)
 	}
 }

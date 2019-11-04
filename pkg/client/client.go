@@ -1,16 +1,13 @@
 package client
 
 import (
-	"log"
 	"net/rpc"
-	"os"
 
 	"github.com/zahfox/gourd/pkg/command"
+	"github.com/zahfox/gourd/pkg/utils"
 )
 
 type Client struct {
-	sl      *log.Logger
-	el      *log.Logger
 	c       *rpc.Client
 	cmdc    chan *command.Request
 	sigc    chan int
@@ -20,8 +17,6 @@ type Client struct {
 
 func NewClient() Client {
 	return Client{
-		log.New(os.Stdout, "", 0),
-		log.New(os.Stderr, "", 0),
 		getConn(),
 		make(chan *command.Request),
 		make(chan int),
@@ -80,7 +75,7 @@ func (c *Client) run() {
 			c.handleCommand(cmd)
 		case sig := <-c.sigc:
 			if sig > 0 {
-				c.sl.Println("Client stopped")
+				utils.LogDebug("Client stopped")
 				return
 			}
 		}
@@ -111,7 +106,7 @@ func (c *Client) handleCommand(cmd *command.Request) {
 	}
 
 	if err != nil {
-		c.el.Println("Error from command", err)
+		utils.LogError("Error from command", err)
 	} else {
 		c.resc <- msg
 	}
