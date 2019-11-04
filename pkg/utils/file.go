@@ -1,12 +1,9 @@
-// Package utils is a collection of misc tools shared by each package
-// of the gourd module
+// Package utils is a collection of misc tools shared any gourd application
 package utils
 
 import (
-	"bufio"
 	"encoding/json"
 	"io/ioutil"
-	"os"
 )
 
 // WriteJSON saves a data structure to a path in JSON format
@@ -17,27 +14,7 @@ func WriteJSON(path string, data interface{}) error {
 	}
 
 	bytes = append(bytes, byte('\n'))
-	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, 0640)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	writer := bufio.NewWriter(file)
-	_, err = writer.Write(bytes)
-
-	if err != nil {
-		writer.Reset(writer)
-		return err
-	}
-
-	err = writer.Flush()
-	if err != nil {
-		return err
-	}
-
-	err = file.Sync()
-	return err
+	return ioutil.WriteFile(path, bytes, 0640)
 }
 
 // ReadJSON decodes JSON formatted data from a path into a data structure
