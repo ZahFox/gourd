@@ -4,10 +4,11 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var sol *log.Logger
-var sel *log.Logger
+var sol *log.Logger = log.New()
+var sel *log.Logger = log.New()
 var ready = false
 
+// SetupLogging is used to configure the primary loggers
 func SetupLogging(fn func(*log.Logger, *log.Logger)) {
 	if !ready {
 		ready = true

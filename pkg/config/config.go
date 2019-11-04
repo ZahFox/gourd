@@ -31,9 +31,9 @@ func Load() {
 		return
 	}
 
+	setupLogging()
 	checkConfigDir()
 	loadConfig()
-	setupLogging()
 }
 
 func checkConfigDir() {
@@ -61,14 +61,10 @@ func loadConfig() *Config {
 
 func setupLogging() {
 	utils.SetupLogging(func(sol *log.Logger, sel *log.Logger) {
-		sol = log.New()
 		sol.SetFormatter(&log.TextFormatter{})
 		sol.SetOutput(os.Stdout)
-
-		sel = log.New()
 		sel.SetFormatter(&log.TextFormatter{})
 		sel.SetOutput(os.Stderr)
-
 		env := GetEnv()
 		switch env {
 		case Prod:
