@@ -15,7 +15,7 @@ HOST_GOARCH:=$(shell go env GOARCH)
 REPOPATH = github.com/zahfox/gourd
 INSTALL_DIR = /usr/local/bin/
 
-WHAT := gourd gourdd
+WHAT := gourd gourdd gsh
 
 info:
 			@echo "$(VERSION) $(HOST_GOOS) $(HOST_GOARCH) $(REPOPATH) $(BUILD_TAGS)"

@@ -26,7 +26,7 @@ func (d *Daemon) Listen() {
 		}
 
 		log.Printf("New socket connection from %s\n", conn.RemoteAddr().String())
-		rpc.HandleConnection(conn)
+		go rpc.HandleConnection(conn)
 	}
 }
 

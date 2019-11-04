@@ -14,6 +14,7 @@ type Client struct {
 	c       *rpc.Client
 	cmdc    chan *command.Request
 	sigc    chan int
+	resc    chan string
 	running bool
 }
 
@@ -23,21 +24,27 @@ func NewClient() Client {
 		log.New(os.Stderr, "", 0),
 		getConn(),
 		make(chan *command.Request),
-		make(chan int), false}
+		make(chan int),
+		make(chan string),
+		false}
 }
 
-func (c *Client) Echo(msg string) {
+func (c *Client) Echo(msg string) string {
 	if c.running {
 		cmd := command.NewRequest(command.ECHO, command.HOST, msg)
 		c.cmdc <- &cmd
+		return <-c.resc
 	}
+	return ""
 }
 
-func (c *Client) Ping() {
+func (c *Client) Ping() string {
 	if c.running {
 		cmd := command.NewRequest(command.PING, command.HOST, nil)
 		c.cmdc <- &cmd
+		return <-c.resc
 	}
+	return ""
 }
 
 func (c *Client) Exit() {
@@ -105,8 +112,7 @@ func (c *Client) handleCommand(cmd *command.Request) {
 
 	if err != nil {
 		c.el.Println("Error from command", err)
-		return
 	} else {
-		c.sl.Println(msg)
+		c.resc <- msg
 	}
 }
