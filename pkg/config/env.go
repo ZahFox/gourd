@@ -3,8 +3,6 @@ package config
 import (
 	"os"
 	"strings"
-
-	"github.com/zahfox/gourd/pkg/utils"
 )
 
 // Env is an integer that represents a particular Linux distribution
@@ -30,9 +28,21 @@ var socketPath = ""
 func GetEnv() Env {
 	if env == Unknown {
 		env = processEnv()
-		utils.LogInfof("Running in a %s environment", envToString())
 	}
 	return env
+}
+
+// EnvStr returns a human readable form of value for the current environment
+func EnvStr() string {
+	switch GetEnv() {
+	case Prod:
+		return "production"
+	case Dev:
+		return "development"
+	case Debug:
+		return "debug"
+	}
+	return "unknown"
 }
 
 // GetSocketPath returns the filesystem path to the command socket
@@ -77,16 +87,4 @@ func processEnv() Env {
 	}
 
 	return defaultEnv
-}
-
-func envToString() string {
-	switch env {
-	case Prod:
-		return "production"
-	case Dev:
-		return "development"
-	case Debug:
-		return "debug"
-	}
-	return "unknown"
 }

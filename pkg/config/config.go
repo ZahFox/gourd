@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/zahfox/gourd/pkg/utils"
 )
 
@@ -32,6 +33,7 @@ func Load() {
 
 	checkConfigDir()
 	loadConfig()
+	setupLogging()
 }
 
 func checkConfigDir() {
@@ -55,6 +57,27 @@ func loadConfig() *Config {
 	// 1. Validate the config file
 	// 2. Add logic for configs with outdated or invalid versions
 	return data
+}
+
+func setupLogging() {
+	utils.SetupLogging(func(sol *log.Logger, sel *log.Logger) {
+		sol = log.New()
+		sol.SetFormatter(&log.TextFormatter{})
+		sol.SetOutput(os.Stdout)
+
+		sel = log.New()
+		sel.SetFormatter(&log.TextFormatter{})
+		sel.SetOutput(os.Stderr)
+
+		env := GetEnv()
+		switch env {
+		case Prod:
+			sol.SetLevel(log.InfoLevel)
+			break
+		default:
+			sol.SetLevel(log.DebugLevel)
+		}
+	})
 }
 
 func getDefaultConfig() *Config {

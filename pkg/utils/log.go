@@ -1,33 +1,18 @@
 package utils
 
 import (
-	"os"
-
 	log "github.com/sirupsen/logrus"
-	"github.com/zahfox/gourd/pkg/config"
 )
 
 var sol *log.Logger
 var sel *log.Logger
+var ready = false
 
-func init() {
-	sol = log.New()
-	sol.SetFormatter(&log.TextFormatter{})
-	sol.SetOutput(os.Stdout)
-
-	sel = log.New()
-	sel.SetFormatter(&log.TextFormatter{})
-	sel.SetOutput(os.Stderr)
-
-	env := config.GetEnv()
-	switch env {
-	case config.Prod:
-		sol.SetLevel(log.InfoLevel)
-		break
-	default:
-		sol.SetLevel(log.DebugLevel)
+func SetupLogging(fn func(*log.Logger, *log.Logger)) {
+	if !ready {
+		ready = true
+		fn(sol, sel)
 	}
-
 }
 
 // LogDebug logs messages at the debug level
