@@ -1,37 +1,33 @@
-# Build image
-FROM golang:1.13.0-alpine AS builder
+# Stage 1: Builder Container
+ARG GO_VERSION=1.13
 
-ENV GOFLAGS="-mod=readonly"
+FROM golang:${GO_VERSION}-alpine AS builder
 
-RUN apk add --update --no-cache ca-certificates make git curl bzr
+RUN apk add --update --no-cache ca-certificates git make
 
 RUN mkdir -p /workspace
 WORKDIR /workspace
-
-ARG GOPROXY
-
 COPY go.* /workspace/
+
+ENV GOFLAGS="-mod=readonly"
 RUN go mod download
 
 COPY . /workspace
+RUN make build
 
-RUN set -xe && make build && mv build /build;
-
-
-# Final image
+# Stage 2: Runtime Container
 FROM alpine:3.10.1
 
-RUN apk add --update --no-cache ca-certificates tzdata bash curl
+RUN addgroup -S gourd && adduser -S gourd -G gourd
+RUN apk add --update --no-cache ca-certificates
 
-SHELL ["/bin/bash", "-c"]
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=builder /workspace/bin/* /usr/local/bin/
 
-# set up nsswitch.conf for Go's "netgo" implementation
-# https://github.com/gliderlabs/docker-alpine/issues/367#issuecomment-424546457
-RUN test ! -e /etc/nsswitch.conf && echo 'hosts: files dns' > /etc/nsswitch.conf
-
-COPY --from=builder /build/* /usr/local/bin/
 RUN mkdir -p /run/gourd
 RUN touch /run/gourd/gourdd.sock
+RUN chown gourd:gourd /run/gourd /usr/local/bin/gourdd
 
+USER gourd
 EXPOSE 8000
-CMD ["gourdd"]
+CMD ["/usr/local/bin/gourdd"]
