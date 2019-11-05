@@ -96,5 +96,5 @@ func UserCanExec(path string) (bool, error) {
 		return true, nil
 	}
 
-	return false, fmt.Errorf("The current user does not have permission to execute: %s.", path)
+	return false, fmt.Errorf("the current user does not have permission to execute: %s", path)
 }

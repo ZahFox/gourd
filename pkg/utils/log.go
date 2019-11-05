@@ -36,12 +36,12 @@ func LogErrorf(msg string, args ...interface{}) {
 	sel.Errorf(msg, args...)
 }
 
-// LogError logs messages at the error level
+// LogFatal logs messages at the error level
 func LogFatal(args ...interface{}) {
 	sel.Fatal(args...)
 }
 
-// LogErrorf logs messages at the error level
+// LogFatalf logs messages at the error level
 func LogFatalf(msg string, args ...interface{}) {
 	sel.Fatalf(msg, args...)
 }
