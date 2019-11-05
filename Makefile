@@ -31,8 +31,8 @@ install: clean-install build
 						sudo chown $(USER) $(INSTALL_DIR)$$target; \
 			done; \
 			if [ ! -z "$$SYSTEMD" ] && [ "$$SYSTEMD" -eq "1" ]; then \
-				sudo cp install/gourdd.service /etc/systemd/system/gourdd.service; \
-				sudo cp install/gourdd.socket /etc/systemd/system/gourdd.socket; \
+				sudo cp init/gourdd.service /etc/systemd/system/gourdd.service; \
+				sudo cp init/gourdd.socket /etc/systemd/system/gourdd.socket; \
 				sudo systemctl daemon-reload; \
 				sudo systemctl enable gourdd.socket; \
 				sudo systemctl start gourdd.socket; \
