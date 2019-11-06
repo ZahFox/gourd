@@ -19,7 +19,6 @@ RUN make build
 FROM alpine:3.10.1
 
 RUN addgroup -S gourd && adduser -S gourd -G gourd
-RUN apk add --update --no-cache ca-certificates
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /workspace/bin/* /usr/local/bin/
