@@ -3,6 +3,9 @@ Description=gourdd socket
 
 [Socket]
 ListenStream=/run/gourd/gourdd.sock
+SocketUser=gourd
+SocketGroup=gourd
+SocketMode=0660
 NoDelay=true
 
 [Install]

@@ -32,8 +32,17 @@ type OsInfo struct {
 
 var osInfo OsInfo
 
+var gourdID GourdID = GourdID{
+	GID: -1,
+	UID: -1,
+}
+
 // GetGourdID returns the IDs for the gourd user and group
 func GetGourdID() (GourdID, error) {
+	if gourdID.UID != -1 {
+		return gourdID, nil
+	}
+
 	grp, err := user.LookupGroup("gourd")
 	if err != nil {
 		return GourdID{-1, -1}, err
@@ -54,7 +63,9 @@ func GetGourdID() (GourdID, error) {
 		return GourdID{-1, -1}, err
 	}
 
-	return GourdID{GID: gid, UID: uid}, nil
+	IDs := GourdID{GID: gid, UID: uid}
+	gourdID = IDs
+	return IDs, nil
 }
 
 // Os returns OsInfo about the host machine.

@@ -25,12 +25,13 @@ func begin() {
 		return
 	}
 
+	dir := configDir()
 	common.EnvConfig(utils.GetEnv(), common.EnvConfigOpts{
 		Name:   "gsh",
-		Path:   configDir(),
+		Path:   dir,
 		Prefix: "GSH",
 		Write: func() error {
-			return utils.WriteJSON(fmt.Sprintf("%s/gsh.json", configDir()), Config{
+			return utils.WriteJSON(fmt.Sprintf("%s/gsh.json", dir), Config{
 				Version: CurrentVersion,
 			})
 		},

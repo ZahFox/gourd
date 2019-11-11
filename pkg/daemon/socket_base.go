@@ -11,9 +11,21 @@ import (
 
 // CreateListener creates a network listener to be used by gourdd
 func CreateListener(socketPath string) (net.Listener, error) {
-	if err := os.RemoveAll(socketPath); err != nil {
+	gourdID, err := utils.GetGourdID()
+	if err != nil {
+		return nil, nil
+	}
+
+	if err = os.RemoveAll(socketPath); err != nil {
 		utils.LogFatal(err)
 	}
 
-	return net.Listen("unix", socketPath)
+	l, err := net.Listen("unix", socketPath)
+	if err != nil {
+		return l, err
+	}
+
+	os.Chown(socketPath, gourdID.UID, gourdID.GID)
+	os.Chmod(socketPath, 0660)
+	return l, nil
 }

@@ -26,7 +26,7 @@ build: clean-build
 			done
 
 install: clean-install build
-			sudo useradd -M -U -r --system -s /bin/false gourd 1>/dev/null 2>&1; \
+			sudo useradd -Urs /bin/false gourd 1>/dev/null 2>&1; \
 			sudo mkdir -p /etc/gourd; \
 			sudo chown -R gourd:gourd /etc/gourd; \
 			sudo chmod -R 750 /etc/gourd; \
