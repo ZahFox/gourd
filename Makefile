@@ -25,7 +25,11 @@ build: clean-build
 						$(BUILD_ENV_FLAGS) go build $(BUILD_TAGS) $(V) -o bin/$$target -ldflags "-X $(REPOPATH).Version=$(VERSION)" ./cmd/$$target; \
 			done
 
-install: clean-install build 
+install: clean-install build
+			sudo useradd -M -U -r --system -s /bin/false gourd 1>/dev/null 2>&1; \
+			sudo mkdir -p /etc/gourd; \
+			sudo chown -R gourd:gourd /etc/gourd; \
+			sudo chmod -R 750 /etc/gourd; \
 			for target in $(WHAT); do \
 						sudo cp bin/$$target $(INSTALL_DIR)$$target; \
 						sudo chown $(USER) $(INSTALL_DIR)$$target; \
@@ -44,7 +48,7 @@ clean-build:
 			rm -rf ./bin
 
 clean-install:
-			if [ ! -z "$$SYSTEMD" ] && [ "$$SYSTEMD" -eq "1" ]; then \
+			if [ ! -z "$$SYSTEMD" ] && [ "$$SYSTEMD" -eq "1" ]; 	then \
 				sudo systemctl stop gourdd.socket > /dev/null; \
 				sudo systemctl disable gourdd.socket > /dev/null; \
 				sudo systemctl stop gourdd.service > /dev/null; \

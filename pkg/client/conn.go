@@ -5,7 +5,6 @@ import (
 	"net/rpc"
 
 	"github.com/ugorji/go/codec"
-	"github.com/zahfox/gourd/pkg/config"
 	"github.com/zahfox/gourd/pkg/utils"
 )
 
@@ -17,8 +16,8 @@ func init() {
 	handle.ReaderBufferSize = 8192
 }
 
-func getConn() *rpc.Client {
-	nc, err := net.Dial("unix", config.GetSocketPath())
+func getConn(path string) *rpc.Client {
+	nc, err := net.Dial("unix", path)
 	if err != nil {
 		utils.LogFatal("Failed to connect to gourdd. ", err)
 	}

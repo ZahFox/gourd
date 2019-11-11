@@ -1,4 +1,4 @@
-package main
+package shell
 
 import (
 	"fmt"
@@ -6,11 +6,11 @@ import (
 	p "github.com/c-bata/go-prompt"
 )
 
-func printGreeting() {
+func PrintGreeting() {
 	fmt.Println("Welcome to gsh.\nType \"help\" for more information.")
 }
 
-func printHelp() {
+func PrintHelp() {
 	fmt.Println(`Usage: [COMMAND] [ARGUMENTS]...
 	gsh is an interactive shell for gourd
 	
@@ -22,7 +22,7 @@ func printHelp() {
 	`)
 }
 
-func getPrefixColor(shell *Shell) p.Color {
+func GetPrefixColor(shell *Shell) p.Color {
 	if shell.HasErr() {
 		return p.DarkRed
 	}
@@ -65,7 +65,7 @@ func getPrefixColor(shell *Shell) p.Color {
 	return p.DefaultColor
 }
 
-func setColorFromStr(shell *Shell, s string) {
+func SetColorFromStr(shell *Shell, s string) {
 	switch s {
 	case "DEFAULT":
 		{

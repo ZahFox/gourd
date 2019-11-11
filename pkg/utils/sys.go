@@ -13,6 +13,14 @@ import (
 	"github.com/pkg/errors"
 )
 
+// GourdID holds the system's IDs for the gourd group and user
+type GourdID struct {
+	// GID is the system gourd group id
+	GID int
+	// UID is the system gourd user id
+	UID int
+}
+
 // OsInfo represents data about the host machine's operating system
 type OsInfo struct {
 	KernelName      string `json:"kernel_name"`
@@ -23,6 +31,31 @@ type OsInfo struct {
 }
 
 var osInfo OsInfo
+
+// GetGourdID returns the IDs for the gourd user and group
+func GetGourdID() (GourdID, error) {
+	grp, err := user.LookupGroup("gourd")
+	if err != nil {
+		return GourdID{-1, -1}, err
+	}
+
+	usr, err := user.Lookup("gourd")
+	if err != nil {
+		return GourdID{-1, -1}, err
+	}
+
+	gid, err := strconv.Atoi(grp.Gid)
+	if err != nil {
+		return GourdID{-1, -1}, err
+	}
+
+	uid, err := strconv.Atoi(usr.Uid)
+	if err != nil {
+		return GourdID{-1, -1}, err
+	}
+
+	return GourdID{GID: gid, UID: uid}, nil
+}
 
 // Os returns OsInfo about the host machine.
 func Os() (OsInfo, error) {

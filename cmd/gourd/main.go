@@ -10,15 +10,14 @@ import (
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
 
+	"github.com/zahfox/gourd/internal/gourd/config"
 	"github.com/zahfox/gourd/pkg/client"
-	"github.com/zahfox/gourd/pkg/config"
 	"github.com/zahfox/gourd/pkg/distro"
 	"github.com/zahfox/gourd/pkg/misc"
 	"github.com/zahfox/gourd/pkg/utils"
 )
 
 func main() {
-	config.Load()
 	app := cli.NewApp()
 	configureAppInfo(app)
 	configureAppCommands(app)
@@ -73,7 +72,7 @@ func configureAppCommands(app *cli.App) {
 			Name:  "client",
 			Usage: "Starts a new gourd client",
 			Action: func(c *cli.Context) error {
-				client := client.NewClient()
+				client := client.NewClient(config.GetSocketPath())
 				client.Run()
 
 				go func() {

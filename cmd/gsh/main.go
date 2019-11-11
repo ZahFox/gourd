@@ -5,16 +5,22 @@ import (
 	"strings"
 
 	p "github.com/c-bata/go-prompt"
+	"github.com/zahfox/gourd/internal/gsh/config"
+	"github.com/zahfox/gourd/internal/gsh/shell"
+	s "github.com/zahfox/gourd/internal/gsh/shell"
 )
 
 func main() {
-	shell := NewShell(NewShellOpts{
+	shell := s.NewShell(s.NewShellOpts{
 		PromptText:  ">>> ",
-		PromptColor: DarkBlue,
+		PromptColor: s.DarkBlue,
+		Client: s.ClientConfig{
+			SocketPath: config.GetSocketPath(),
+		},
 	})
 
 	defer shell.Die(0)
-	printGreeting()
+	s.PrintGreeting()
 
 	var ctrlCBinding = p.KeyBind{
 		Key: p.ControlC,
@@ -42,7 +48,7 @@ func main() {
 
 	for {
 		options := append([]p.Option{
-			p.OptionPrefixTextColor(getPrefixColor(&shell)),
+			p.OptionPrefixTextColor(s.GetPrefixColor(&shell)),
 		}, staticOptions...)
 
 		input := p.Input("", completer, options...)
@@ -78,7 +84,7 @@ func main() {
 			}
 		case "?", "HELP":
 			{
-				printHelp()
+				s.PrintHelp()
 				continue
 			}
 		case "EXIT", "Q", "QUIT":
@@ -91,7 +97,7 @@ func main() {
 	}
 }
 
-func builtInCommand(s *Shell, input string, command string, args []string) {
+func builtInCommand(s *s.Shell, input string, command string, args []string) {
 	argCount := len(args)
 
 	switch command {
@@ -111,7 +117,7 @@ func builtInCommand(s *Shell, input string, command string, args []string) {
 				}
 
 				if argCount == 3 {
-					setColorFromStr(s, strings.ToUpper(strings.Trim(args[2], " ")))
+					shell.SetColorFromStr(s, strings.ToUpper(strings.Trim(args[2], " ")))
 				}
 			} else {
 				s.SetErrF("invalid target for @set: %s\n", strings.Trim(args[0], " "))
@@ -130,7 +136,7 @@ func builtInCommand(s *Shell, input string, command string, args []string) {
 	s.SetErrF("invalid bultin command: %s\n", input)
 }
 
-func promptPrefix(s *Shell) func() (string, bool) {
+func promptPrefix(s *s.Shell) func() (string, bool) {
 	return func() (string, bool) { return s.GetPromptText(), true }
 }
 

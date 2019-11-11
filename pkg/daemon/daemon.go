@@ -3,7 +3,6 @@ package daemon
 import (
 	"net"
 
-	"github.com/zahfox/gourd/pkg/config"
 	"github.com/zahfox/gourd/pkg/daemon/rpc"
 	"github.com/zahfox/gourd/pkg/utils"
 )
@@ -33,14 +32,14 @@ func (d *Daemon) Listen() {
 var daemon *Daemon
 
 // GetDaemon will return the primary instance of gourdd
-func GetDaemon() *Daemon {
+func GetDaemon(socketPath string) *Daemon {
 	if daemon == nil {
 		daemon = new(Daemon)
 		daemon.ID = 0
 
-		socket, err := CreateListener()
+		socket, err := CreateListener(socketPath)
 		if err != nil {
-			utils.LogFatalf("Failed to listen to socket at %s. %s", config.GetSocketPath(), err)
+			utils.LogFatalf("Failed to listen to socket at %s. %s", socketPath, err)
 		}
 
 		daemon.Socket = socket

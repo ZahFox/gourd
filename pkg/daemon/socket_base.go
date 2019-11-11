@@ -6,13 +6,11 @@ import (
 	"net"
 	"os"
 
-	"github.com/zahfox/gourd/pkg/config"
 	"github.com/zahfox/gourd/pkg/utils"
 )
 
 // CreateListener creates a network listener to be used by gourdd
-func CreateListener() (net.Listener, error) {
-	socketPath := config.GetSocketPath()
+func CreateListener(socketPath string) (net.Listener, error) {
 	if err := os.RemoveAll(socketPath); err != nil {
 		utils.LogFatal(err)
 	}

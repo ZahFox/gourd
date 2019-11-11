@@ -15,9 +15,9 @@ type Client struct {
 	running bool
 }
 
-func NewClient() Client {
+func NewClient(socketPath string) Client {
 	return Client{
-		getConn(),
+		getConn(socketPath),
 		make(chan *command.Request),
 		make(chan int),
 		make(chan string),

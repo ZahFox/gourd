@@ -10,7 +10,7 @@ import (
 )
 
 // CreateListener creates a network listener to be used by gourdd
-func CreateListener() (net.Listener, error) {
+func CreateListener(socketPath string) (net.Listener, error) {
 	if os.Getenv("LISTEN_PID") == strconv.Itoa(os.Getpid()) {
 		f := os.NewFile(3, "socket")
 		return net.FileListener(f)

@@ -1,4 +1,4 @@
-package main
+package shell
 
 import (
 	"fmt"
@@ -23,24 +23,35 @@ const (
 	White
 )
 
-// ShellState is used to hold any data that the active shell might need
-type ShellState struct {
+// ClientConfig is the options used for the gourd client
+type ClientConfig struct {
+	SocketPath string
+}
+
+// State is used to hold any data that the active shell might need
+type State struct {
 	clientStarted bool
 	promptText    string
 	promptColor   Color
 	err           string
 }
 
+type shellConfig struct {
+	socketPath string
+}
+
 // Shell is used to represent the data and behaviour of gsh
 type Shell struct {
-	state  ShellState
+	state  State
 	client c.Client
+	config shellConfig
 }
 
 // NewShellOpts are the initial options used for a new shell
 type NewShellOpts struct {
 	PromptColor Color
 	PromptText  string
+	Client      ClientConfig
 }
 
 var errText = chalk.Red.NewStyle().WithBackground(chalk.ResetColor).WithTextStyle(chalk.Bold).Style
@@ -49,7 +60,10 @@ var infoText = chalk.Magenta.NewStyle().WithBackground(chalk.ResetColor).WithTex
 // NewShell creates and configures a new shell
 func NewShell(opts NewShellOpts) Shell {
 	return Shell{
-		state: ShellState{
+		config: shellConfig{
+			socketPath: opts.Client.SocketPath,
+		},
+		state: State{
 			clientStarted: false,
 			promptColor:   opts.PromptColor,
 			promptText:    opts.PromptText,
@@ -131,6 +145,6 @@ func (s *Shell) startClient() {
 		return
 	}
 	s.state.clientStarted = true
-	s.client = c.NewClient()
+	s.client = c.NewClient(s.config.socketPath)
 	s.client.Run()
 }
