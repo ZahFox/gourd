@@ -34,6 +34,7 @@ install: clean-install build
 			for target in $(WHAT); do \
 				sudo cp bin/$$target $(INSTALL_DIR)$$target; \
 				sudo chown gourd:gourd $(INSTALL_DIR)$$target; \
+				sudo chmod 550 $(INSTALL_DIR)$$target; \
 			done; \
 			if [ ! -z "$$SYSTEMD" ] && [ "$$SYSTEMD" -eq "1" ]; then \
 				sudo cp init/gourdd.service /etc/systemd/system/gourdd.service; \
