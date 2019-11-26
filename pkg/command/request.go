@@ -44,6 +44,25 @@ func (r *PingRequest) GetParams() interface{} {
 	return nil
 }
 
+// InstallRequest is what a clients use to issue new install commands
+type InstallRequest struct {
+	Action Action `json:"action"`
+	Target Target `json:"target"`
+	Item   string `json:"item"`
+}
+
+func (r *InstallRequest) GetAction() Action {
+	return INSTALL
+}
+
+func (r *InstallRequest) GetTarget() Target {
+	return r.Target
+}
+
+func (r *InstallRequest) GetParams() interface{} {
+	return r.Item
+}
+
 // NewRequest creates a new command request
 func NewRequest(action Action, target Target, params interface{}) Request {
 	switch action {
@@ -57,6 +76,12 @@ func NewRequest(action Action, target Target, params interface{}) Request {
 		return &PingRequest{
 			Action: action,
 			Target: target,
+		}
+	case INSTALL:
+		return &InstallRequest{
+			Action: action,
+			Target: target,
+			Item:   params.(string),
 		}
 	}
 	return nil

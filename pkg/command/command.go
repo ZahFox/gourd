@@ -80,6 +80,11 @@ func NewHostEcho(msg string) Command {
 	return NewCommand(ECHO, HOST, msg)
 }
 
+// NewHostInstall creates a new install command for the local gourdd
+func NewHostInstall(item string) Command {
+	return NewCommand(INSTALL, HOST, item)
+}
+
 // ActionCode converts an action string into its code representation
 func ActionCode(action string) Action {
 	switch action {
@@ -87,6 +92,8 @@ func ActionCode(action string) Action {
 		return PING
 	case "ECHO":
 		return ECHO
+	case "INSTALL":
+		return INSTALL
 	}
 	return NOACTION
 }
@@ -100,6 +107,8 @@ func ActionString(action Action) string {
 		return "PING"
 	case ECHO:
 		return "ECHO"
+	case INSTALL:
+		return "INSTALL"
 	}
 	return "NOACTION"
 }

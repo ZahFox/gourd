@@ -1,4 +1,4 @@
-package command 
+package command
 
 // Action is what the gourd client is requesting to be done
 type Action int
@@ -10,4 +10,6 @@ const (
 	PING
 	// ECHO is a request to have text echoed back
 	ECHO
+	// INSTALL is a request to download software from the internet
+	INSTALL
 )

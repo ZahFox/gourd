@@ -45,6 +45,25 @@ func (r *PingResponse) GetData() interface{} {
 	return r.Message
 }
 
+// InstallResponse is what a client will recieve after issuing a install command
+type InstallResponse struct {
+	ID      string `json:"id"`
+	Error   string `json:"error"`
+	Message string `json:"message"`
+}
+
+func (r *InstallResponse) GetId() string {
+	return r.ID
+}
+
+func (r *InstallResponse) GetError() string {
+	return r.Error
+}
+
+func (r *InstallResponse) GetData() interface{} {
+	return r.Message
+}
+
 // NewResponse creates a new command response
 func NewResponse(cmd *Command, err string) Response {
 	switch cmd.Action {
@@ -56,6 +75,12 @@ func NewResponse(cmd *Command, err string) Response {
 		}
 	case PING:
 		return &PingResponse{
+			ID:      cmd.ID,
+			Error:   err,
+			Message: cmd.Body.(string),
+		}
+	case INSTALL:
+		return &InstallResponse{
 			ID:      cmd.ID,
 			Error:   err,
 			Message: cmd.Body.(string),

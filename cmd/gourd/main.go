@@ -6,6 +6,7 @@ import (
 	"net"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
@@ -28,7 +29,7 @@ func main() {
 
 func configureAppInfo(app *cli.App) {
 	app.Name = "gourd"
-	app.Usage = "linux configuration tool"
+	app.Usage = "system management tool"
 }
 
 func configureAppCommands(app *cli.App) {
@@ -85,7 +86,7 @@ func configureAppCommands(app *cli.App) {
 					client.Stop()
 				}()
 
-				utils.LogInfo("Waiting for gourd client to exit")
+				utils.LogInfo("waiting for gourd client to exit")
 				client.Wait()
 				client.Exit()
 				return nil
@@ -93,9 +94,30 @@ func configureAppCommands(app *cli.App) {
 		},
 		{
 			Name:  "install",
-			Usage: "Installs a package using the distribution package manager",
+			Usage: "download data from the internet",
 			Action: func(c *cli.Context) error {
-				distro.GetDistro().Install(c.Args()...)
+				var item string
+				arg := c.Args().First()
+				if len(arg) > 0 {
+					item = strings.Trim(arg, " ")
+					if len(item) < 1 {
+						return fmt.Errorf("please specifcy an item to install")
+					}
+				} else {
+					return fmt.Errorf("please specifcy an item to install")
+				}
+
+				client := client.NewClient(config.GetSocketPath())
+				client.Run()
+
+				go func(item string) {
+					msg := client.Install(item)
+					fmt.Println(msg)
+					client.Stop()
+				}(item)
+
+				client.Wait()
+				client.Exit()
 				return nil
 			},
 		},
