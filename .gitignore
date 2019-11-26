@@ -13,3 +13,4 @@ gourd
 .vscode
 
 !cmd/gourd
+!internal/gourd
