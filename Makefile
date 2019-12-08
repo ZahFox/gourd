@@ -30,6 +30,7 @@ install: clean-install build
 			sudo useradd -Urs /bin/false gourd 1>/dev/null 2>&1; \
 			sudo mkdir -p /etc/gourd /opt/gourd; \
 			sudo chown -R gourd:gourd /etc/gourd /opt/gourd; \
+			sudo chmod 750 /etc/gourd; \
 			sudo chmod -R 750 /etc/gourd; \
 			for target in $(WHAT); do \
 				sudo cp bin/$$target $(INSTALL_DIR)$$target; \
