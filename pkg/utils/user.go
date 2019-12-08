@@ -17,3 +17,8 @@ func init() {
 func HomeDir() string {
 	return currentUser.HomeDir
 }
+
+// Username returns the username of the user that owns the running process
+func Username() string {
+	return currentUser.Username
+}

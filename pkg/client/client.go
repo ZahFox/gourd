@@ -49,7 +49,8 @@ func (c *Client) Ping() string {
 // Install sends an install command
 func (c *Client) Install(item string) string {
 	if c.running {
-		cmd := command.NewRequest(command.INSTALL, command.HOST, item)
+		params := command.InstallRequestParams{Item: item, User: utils.Username()}
+		cmd := command.NewRequest(command.INSTALL, command.HOST, params)
 		c.cmdc <- &cmd
 		return <-c.resc
 	}

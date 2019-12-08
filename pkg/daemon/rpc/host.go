@@ -37,14 +37,14 @@ func (c *Host) Echo(message *string, reply *command.EchoResponse) error {
 }
 
 // Install responds with a message indicating whether the installation succeeded or failed
-func (c *Host) Install(item *string, reply *command.InstallResponse) error {
-	i := *item
+func (c *Host) Install(params *command.InstallRequestParams, reply *command.InstallResponse) error {
+	i := params.Item
 	cmd := command.NewHostInstall(i)
 	utils.LogInfo(cmd.String())
 	var msg string = "nothing happened"
 
 	if i == "ltb" || i == "linux-toolbox" {
-		if err := ltb.Install(); err != nil {
+		if err := ltb.InstallForUser(params.User); err != nil {
 			msg = fmt.Sprintf("linux-toolbox install failed\n%s", err.Error())
 		} else {
 			msg = fmt.Sprintf("successfully installed: %s", i)

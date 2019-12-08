@@ -49,6 +49,17 @@ type InstallRequest struct {
 	Action Action `json:"action"`
 	Target Target `json:"target"`
 	Item   string `json:"item"`
+	User   string `json:"user"`
+}
+
+// InstallRequestParams identify what to install and who to install it for
+type InstallRequestParams struct {
+	Item string `json:"item"`
+	User string `json:"user"`
+}
+
+func (p *InstallRequestParams) Read() (string, string) {
+	return p.Item, p.User
 }
 
 func (r *InstallRequest) GetAction() Action {
@@ -60,7 +71,7 @@ func (r *InstallRequest) GetTarget() Target {
 }
 
 func (r *InstallRequest) GetParams() interface{} {
-	return r.Item
+	return InstallRequestParams{Item: r.Item, User: r.User}
 }
 
 // NewRequest creates a new command request
@@ -78,10 +89,13 @@ func NewRequest(action Action, target Target, params interface{}) Request {
 			Target: target,
 		}
 	case INSTALL:
+		installParams := params.(InstallRequestParams)
+		item, user := installParams.Read()
 		return &InstallRequest{
 			Action: action,
 			Target: target,
-			Item:   params.(string),
+			Item:   item,
+			User:   user,
 		}
 	}
 	return nil
