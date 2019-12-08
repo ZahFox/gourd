@@ -1,3 +1,4 @@
+# Build Files
 *.o
 *.orig
 /bin/
@@ -5,12 +6,9 @@
 /build/
 *.txt
 
-gourd.go
-gourd
-
 # Editor Files
 *.code-workspace
 .vscode
 
-!cmd/gourd
-!internal/gourd
+# Personal Files
+TODOS.md
